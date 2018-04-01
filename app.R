@@ -271,12 +271,6 @@ ui <- fluidPage(
           min =  0.1,
           step = 0.1
         )
-      ),
-
-      # Submit button ---
-      actionButton(
-        inputId = "submit",
-        label = "Submit"
       )
     ),
 
@@ -349,50 +343,50 @@ server <- function(input, output, session) {
   output$titrantPk <- renderText(displayPk(input$titrantName))
   output$analyteFormula <- renderUI(HTML(displayFormula(getFormula(input$analyteName))))
   output$titrantFormula <- renderUI(HTML(displayFormula(getFormula(input$titrantName))))
-  observeEvent(input$submit, {
+  output$pHCurvePlot <- renderPlot({
     pKw <- -log10(input$kw * 1e-14)
-    if (input$analyteName %in% strong.acids$name && input$titrantName %in% strong.bases$name) {
-      output$pHCurvePlot <- renderPlot({
-        sa_sb(
-          conc.acid = input$analyteConcentration,
-          vol.acid = input$analyteVolume,
-          conc.base = input$titrantConcentration,
-          pkw = pKw,
-          eqpt = TRUE
-        )
-      })
-    } else if (input$analyteName %in% strong.bases$name && input$titrantName %in% strong.acids$name) {
-      output$pHCurvePlot <- renderPlot({
-        sb_sa(
-          conc.base = input$analyteConcentration,
-          vol.base = input$analyteVolume,
-          conc.acid = input$titrantConcentration,
-          pkw = pKw,
-          eqpt = TRUE
-        )
-      })
-    } else if (input$analyteName %in% weak.acids$name && input$titrantName %in% strong.bases$name) {
-      output$pHCurvePlot <- renderPlot({
-        wa_sb(
-          conc.acid = input$analyteConcentration,
-          vol.acid = input$analyteVolume,
-          pka = weak.acids$pKa[weak.acids$name == input$analyteName],
-          conc.base = input$titrantConcentration,
-          pkw = pKw,
-          eqpt = TRUE
-        )
-      })
-    } else if (input$analyteName %in% weak.bases$name && input$titrantName %in% strong.acids) {
-      output$pHCurvePlot <- renderPlot({
-        wb_sa(
-          conc.base = input$analyteConcentration,
-          vol.base = input$analyteVolume,
-          pka = pKw - weak.bases$kPb[weak.bases$name == input$analyteName],
-          conc.acid = input$titrantConcentration,
-          pkw = pKw,
-          eqpt = TRUE
-        )
-      })
+    if (input$analyteName %in% strong.acids$name &&
+        input$titrantName %in% strong.bases$name) {
+      sa_sb(
+        conc.acid = input$analyteConcentration,
+        vol.acid = input$analyteVolume,
+        conc.base = input$titrantConcentration,
+        pkw = pKw,
+        eqpt = TRUE
+      )
+      
+    } else if (input$analyteName %in% strong.bases$name &&
+               input$titrantName %in% strong.acids$name) {
+      sb_sa(
+        conc.base = input$analyteConcentration,
+        vol.base = input$analyteVolume,
+        conc.acid = input$titrantConcentration,
+        pkw = pKw,
+        eqpt = TRUE
+      )
+      
+    } else if (input$analyteName %in% weak.acids$name &&
+               input$titrantName %in% strong.bases$name) {
+      wa_sb(
+        conc.acid = input$analyteConcentration,
+        vol.acid = input$analyteVolume,
+        pka = weak.acids$pKa[weak.acids$name == input$analyteName],
+        conc.base = input$titrantConcentration,
+        pkw = pKw,
+        eqpt = TRUE
+      )
+      
+    } else if (input$analyteName %in% weak.bases$name &&
+               input$titrantName %in% strong.acids$name) {
+      wb_sa(
+        conc.base = input$analyteConcentration,
+        vol.base = input$analyteVolume,
+        pka = pKw - weak.bases$kPb[weak.bases$name == input$analyteName],
+        conc.acid = input$titrantConcentration,
+        pkw = pKw,
+        eqpt = TRUE
+      )
+      
     } else {
       # TODO display error
       print("Nope")
